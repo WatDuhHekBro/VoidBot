@@ -1,4 +1,4 @@
-use futures::try_join;
+#[cfg(debug_assertions)]
 use std::env;
 
 use serenity::{
@@ -7,8 +7,7 @@ use serenity::{
         id::GuildId,
         interactions::{
             application_command::{
-                ApplicationCommand, ApplicationCommandInteraction,
-                ApplicationCommandInteractionDataOption, ApplicationCommandOptionType,
+                ApplicationCommand, ApplicationCommandInteraction, ApplicationCommandOptionType,
             },
             Interaction, InteractionApplicationCommandCallbackDataFlags, InteractionResponseType,
         },
@@ -21,37 +20,10 @@ use crate::modules::event_handler::Handler;
 
 impl Handler {
     pub async fn register_slash_commands(&self, ctx: &Context) {
-        let mut dev_guild: Option<GuildId> = None;
-
-        // Check if it's dev mode and if a valid dev guild is specified
-        if env::var("DEV").is_ok() {
-            if let Ok(raw_dev_guild) = env::var("DEV_GUILD") {
-                dev_guild = Some(GuildId(
-                    raw_dev_guild.parse().expect("DEV_GUILD must be an integer"),
-                ));
-            }
-        }
-
-        // Then check if there's a valid dev guild, otherwise set it globally
-        if let Some(dev_guild) = dev_guild {
-            println!("Registered slash commands in dev mode.");
-
-            GuildId::set_application_commands(&dev_guild, &ctx.http, |commands| {
-                set_dev_guild_commands(set_normal_commands(commands))
-            })
-            .await
-            .expect("Error registering slash commands on dev guild");
-        } else {
-            println!("Registered slash commands in release mode.");
-
-            try_join!(
-                ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
-                    set_normal_commands(commands)
-                }),
-                set_guild_commands(&ctx)
-            )
-            .expect("Error on registering slash commands in release mode.");
-        }
+        #[cfg(not(debug_assertions))]
+        register_commands(&ctx).await;
+        #[cfg(debug_assertions)]
+        register_dev_commands(&ctx).await;
     }
 
     pub async fn handle_slash_commands(&self, ctx: &Context, interaction: &Interaction) {
@@ -59,8 +31,7 @@ impl Handler {
             let command = interaction.data.name.as_str();
             let mut subcommand: Option<&str> = None;
             let mut subcommand_group: Option<&str> = None;
-            let mut options: &Vec<ApplicationCommandInteractionDataOption> =
-                &interaction.data.options;
+            let mut options = &interaction.data.options;
 
             // Gather subcommand and subcommand group info if it exists
             if let Some(option) = interaction.data.options.get(0) {
@@ -105,30 +76,38 @@ impl Handler {
     }
 }
 
+#[allow(dead_code)]
+async fn register_commands(ctx: &Context) {
+    ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
+        set_normal_commands(commands)
+    })
+    .await
+    .expect("Error on registering slash commands in production mode.");
+
+    println!("Registered slash commands in production mode.");
+}
+
+#[cfg(debug_assertions)]
+async fn register_dev_commands(ctx: &Context) {
+    let dev_guild = GuildId(
+        env::var("DEV_GUILD")
+            .expect("Expected environmental variable DEV_GUILD")
+            .parse()
+            .expect("DEV_GUILD must be an integer"),
+    );
+
+    GuildId::set_application_commands(&dev_guild, &ctx.http, |commands| {
+        set_normal_commands(commands)
+    })
+    .await
+    .expect("Error registering slash commands on dev guild");
+
+    println!("Registered slash commands in dev mode.");
+}
+
 // Will be guild slash commands in dev and global in prod
 fn set_normal_commands(commands: &mut CreateApplicationCommands) -> &mut CreateApplicationCommands {
     commands.create_application_command(|command| commands::welcome::define(command))
-}
-
-// Will always be guild-specific slash commands, but the guild depends on release values
-async fn set_guild_commands(
-    ctx: &Context,
-) -> Result<(Vec<ApplicationCommand>, Vec<ApplicationCommand>), serenity::Error> {
-    try_join!(
-        GuildId::set_application_commands(&GuildId(0u64), &ctx.http, |commands| {
-            commands.create_application_command(|command| command)
-        }),
-        GuildId::set_application_commands(&GuildId(0u64), &ctx.http, |commands| {
-            commands.create_application_command(|command| command)
-        })
-    )
-}
-
-// Same as above, but the provided dev guild is used
-fn set_dev_guild_commands(
-    commands: &mut CreateApplicationCommands,
-) -> &mut CreateApplicationCommands {
-    commands
 }
 
 async fn reply_invalid_command(
