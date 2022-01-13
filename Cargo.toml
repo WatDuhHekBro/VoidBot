@@ -8,5 +8,6 @@ edition = "2021"
 [dependencies]
 dotenv = "0.15.0"
 futures = "0.3.19"
+rusqlite = { version = "0.26.3", features = ["bundled"] }
 serenity = { version = "0.10.9", default-features = false, features = ["client", "gateway", "model", "rustls_backend", "unstable_discord_api"] }
 tokio = { version = "1.15.0", features = ["macros", "rt-multi-thread"] }

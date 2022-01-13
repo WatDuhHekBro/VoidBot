@@ -1,14 +1,16 @@
 use dotenv::dotenv;
-use serenity::prelude::*;
+use serenity::{client::bridge::gateway::GatewayIntents, prelude::*};
 use std::env;
 
 mod commands;
+mod database;
 mod modules;
 use modules::event_handler::Handler;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
+    database::core::migrate_database();
 
     let token = env::var("DISCORD_TOKEN").expect("Expected environmental variable DISCORD_TOKEN");
 
@@ -21,6 +23,7 @@ async fn main() {
     let mut client = Client::builder(token)
         .event_handler(Handler)
         .application_id(application_id)
+        .intents(GatewayIntents::empty())
         .await
         .expect("Error creating client");
 

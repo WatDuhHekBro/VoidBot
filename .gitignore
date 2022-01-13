@@ -1,4 +1,13 @@
+# Project
 /target
 .env
+
+# SQLite
 *.db
+*-journal
+*-wal
+*-shm
+
+# Windows
 *.exe
+desktop.ini
