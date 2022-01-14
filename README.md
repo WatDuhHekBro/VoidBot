@@ -15,7 +15,7 @@ An experimental Discord bot using Serenity.
 
 # Environment Variables
 - `DISCORD_TOKEN`: The token for your bot. (*required*)
-- `DISCORD_CLIENT_ID`: The client ID for your bot. (*required*)
+- `DISCORD_APPLICATION_ID`: The application ID for your bot. Automatically derived from your bot's token, but can be provided as a manual override in case your application ID doesn't match your bot's client ID. (*optional*)
 - `DISCORD_BOT_OWNER`: The user ID of the bot's owner (*optional* (**required in dev mode**))
 
 ## Debug Environment Variables
