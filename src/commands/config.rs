@@ -1,13 +1,23 @@
 use serenity::{
     builder::CreateApplicationCommand,
-    model::interactions::{
-        application_command::{
-            ApplicationCommandInteraction, ApplicationCommandInteractionDataOption,
-            ApplicationCommandOptionType,
+    model::{
+        channel::ChannelType,
+        interactions::{
+            application_command::{
+                ApplicationCommandInteraction, ApplicationCommandInteractionDataOption,
+                ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
+            },
+            InteractionApplicationCommandCallbackDataFlags, InteractionResponseType,
         },
-        InteractionResponseType,
     },
     prelude::*,
+};
+
+use rusqlite::Connection;
+
+use crate::database::{
+    core::DATABASE_FILE,
+    structs::{default_vc_names, guild::Guild},
 };
 
 // Note: Because of the way Discord's built-in slash command permissions work, permissions are
@@ -71,13 +81,65 @@ pub mod default_voice {
     pub async fn handle(
         ctx: &Context,
         interaction: &ApplicationCommandInteraction,
-        _options: &Vec<ApplicationCommandInteractionDataOption>,
+        options: &Vec<ApplicationCommandInteractionDataOption>,
     ) -> Result<(), serenity::Error> {
+        let channel = options
+            .get(0)
+            .expect("Expected parameter /config default-voice <channel>")
+            .resolved
+            .as_ref()
+            .unwrap();
+        let name = options.get(1);
+        let output;
+
+        if let Some(guild_id) = interaction.guild_id {
+            if let ApplicationCommandInteractionDataOptionValue::Channel(channel) = channel {
+                if channel.kind == ChannelType::Voice {
+                    let db = Connection::open(DATABASE_FILE).unwrap();
+                    let guild_id = guild_id.0;
+                    let channel_id = channel.id.0;
+
+                    if let Some(name) = name {
+                        if let ApplicationCommandInteractionDataOptionValue::String(name) =
+                            name.resolved.as_ref().unwrap()
+                        {
+                            default_vc_names::set_default_name(
+                                &db,
+                                guild_id,
+                                channel_id,
+                                name.to_string(),
+                            );
+                            output = format!(
+                                "Successfully set default name to `{}` for <#{}>.",
+                                name, channel_id
+                            );
+                        } else {
+                            panic!("Expected resolved /config default-voice <channel> <name>");
+                        }
+                    } else {
+                        default_vc_names::remove_default_name(&db, guild_id, channel_id);
+                        output =
+                            format!("Successfully removed default name for <#{}>.", channel_id);
+                    }
+                } else {
+                    output = String::from("You must enter a voice channel.");
+                }
+            } else {
+                panic!("Expected resolved /config default-voice <channel>");
+            }
+        } else {
+            output = String::from("You must use this command in a server.");
+        }
+
         interaction
             .create_interaction_response(&ctx.http, |response| {
                 response
                     .kind(InteractionResponseType::ChannelMessageWithSource)
-                    .interaction_response_data(|message| message.content("/config default-voice"))
+                    .interaction_response_data(|message| {
+                        message
+                            .content(output)
+                            .flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL)
+                    })
             })
             .await
     }
@@ -91,14 +153,52 @@ pub mod stream_embeds_channel {
     pub async fn handle(
         ctx: &Context,
         interaction: &ApplicationCommandInteraction,
-        _options: &Vec<ApplicationCommandInteractionDataOption>,
+        options: &Vec<ApplicationCommandInteractionDataOption>,
     ) -> Result<(), serenity::Error> {
+        let channel = options.get(0);
+        let output;
+
+        if let Some(guild_id) = interaction.guild_id {
+            let db = Connection::open(DATABASE_FILE).unwrap();
+            let guild_id = guild_id.0;
+
+            if let Some(channel) = channel {
+                if let ApplicationCommandInteractionDataOptionValue::Channel(channel) =
+                    channel.resolved.as_ref().unwrap()
+                {
+                    if channel.kind == ChannelType::Text {
+                        let channel_id = channel.id.0;
+                        let mut guild = Guild::read(&db, guild_id);
+                        guild.streaming_channel = Some(channel_id);
+                        guild.write(&db);
+                        output = format!(
+                            "Successfully set stream embeds to show up in <#{}>.",
+                            channel_id
+                        );
+                    } else {
+                        output = String::from("You must enter a text channel.");
+                    }
+                } else {
+                    panic!("Expected resolved /config stream-embeds-channel <channel>");
+                }
+            } else {
+                let mut guild = Guild::read(&db, guild_id);
+                guild.streaming_channel = None;
+                guild.write(&db);
+                output = String::from("Successfully removed stream embeds from this guild.");
+            }
+        } else {
+            output = String::from("You must use this command in a server.");
+        }
+
         interaction
             .create_interaction_response(&ctx.http, |response| {
                 response
                     .kind(InteractionResponseType::ChannelMessageWithSource)
                     .interaction_response_data(|message| {
-                        message.content("/config stream-embeds-channel")
+                        message
+                            .content(output)
+                            .flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL)
                     })
             })
             .await

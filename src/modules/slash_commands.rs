@@ -227,10 +227,14 @@ async fn register_dev_commands(ctx: &Context) -> Vec<ApplicationCommand> {
             .expect("DEV_GUILD must be an integer"),
     );
 
-    dev_guild
+    let commands = dev_guild
         .set_application_commands(&ctx.http, |commands| set_global_commands(commands))
         .await
-        .expect("Error registering slash commands on dev guild.")
+        .expect("Error registering slash commands on dev guild.");
+
+    println!("Registered slash commands in dev mode.");
+
+    commands
 }
 
 #[allow(dead_code)]
@@ -316,7 +320,11 @@ async fn reply_invalid_command(
     .create_interaction_response(&ctx.http, |response| {
         response
             .kind(InteractionResponseType::ChannelMessageWithSource)
-            .interaction_response_data(|message| message.content("**Error:** Invalid command name! This probably means that the command definitions haven't been updated yet or there's a glaring oversight in the code.").flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL))
+            .interaction_response_data(|message| {
+                message
+                    .content("**Error:** Invalid command name! This probably means that the command definitions haven't been updated yet or there's a glaring oversight in the code.")
+                    .flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL)
+            })
     })
     .await
 }
