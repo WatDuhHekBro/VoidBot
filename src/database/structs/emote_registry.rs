@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 // TODO: The data format itself should be solid and future-proof.
 // I'm just not sure what I want the interface to be yet.
 

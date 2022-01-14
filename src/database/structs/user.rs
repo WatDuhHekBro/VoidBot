@@ -1,5 +1,4 @@
 use rusqlite::{params, Connection, OptionalExtension};
-use std::fmt::Debug;
 
 #[derive(Debug)]
 pub enum DaylightSavingsRegion {

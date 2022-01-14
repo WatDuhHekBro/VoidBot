@@ -15,14 +15,14 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected environmental variable DISCORD_TOKEN");
 
     // I don't like having to explicitly define this, but it's a minor inconvenience anyway.
-    let application_id: u64 = env::var("APPLICATION_ID")
-        .expect("Expected environmental variable APPLICATION_ID")
+    let client_id: u64 = env::var("DISCORD_CLIENT_ID")
+        .expect("Expected environmental variable DISCORD_CLIENT_ID")
         .parse()
-        .expect("APPLICATION_ID must be an integer");
+        .expect("DISCORD_CLIENT_ID must be an integer");
 
     let mut client = Client::builder(token)
         .event_handler(Handler)
-        .application_id(application_id)
+        .application_id(client_id)
         .intents(GatewayIntents::empty())
         .await
         .expect("Error creating client");

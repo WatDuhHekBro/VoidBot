@@ -1,6 +1,12 @@
 # VoidBot
 An experimental Discord bot using Serenity.
 
+# Features
+- Emote Commands: `/say`, `/react`, `/emotes`, `/emote-registry`
+- Stream Notification Embeds: `/stream`
+- Timezone Info: `/time`
+- Voice Channel Renaming: `/voice`, `/default-voice`
+
 # Files
 - `voidbot`: The executable file of the bot.
 - `.env`: An optional file to set environment variables while running the bot. Used for read-only configuration data like tokens.
@@ -8,7 +14,8 @@ An experimental Discord bot using Serenity.
 
 # Environment Variables
 - `DISCORD_TOKEN`: The token for your bot. (*required*)
-- `APPLICATION_ID`: The client ID for your bot. (*required*)
+- `DISCORD_CLIENT_ID`: The client ID for your bot. (*required*)
 
 ## Debug Environment Variables
 - `DEV_GUILD`: The guild to test your slash commands on in dev mode. (*required*)
+- `DEV_CLEAR`: A list of comma-separated guilds to clear slash commands from. (*optional*)
