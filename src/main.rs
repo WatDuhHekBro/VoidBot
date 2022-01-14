@@ -12,11 +12,11 @@ async fn main() {
     dotenv().ok();
     database::core::migrate_database();
 
-    let token = env::var("DISCORD_TOKEN").expect("Expected environmental variable DISCORD_TOKEN");
+    let token = env::var("DISCORD_TOKEN").expect("Expected environment variable DISCORD_TOKEN");
 
     // I don't like having to explicitly define this, but it's a minor inconvenience anyway.
     let client_id: u64 = env::var("DISCORD_CLIENT_ID")
-        .expect("Expected environmental variable DISCORD_CLIENT_ID")
+        .expect("Expected environment variable DISCORD_CLIENT_ID")
         .parse()
         .expect("DISCORD_CLIENT_ID must be an integer");
 

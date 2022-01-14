@@ -27,6 +27,6 @@ impl EventHandler for Handler {
             env!("CARGO_PKG_VERSION")
         );
 
-        self.register_slash_commands(&ctx).await;
+        self.register_slash_commands(&ctx, &ready).await;
     }
 }

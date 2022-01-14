@@ -1,4 +1,4 @@
-pub mod default_voice;
+pub mod config;
 pub mod emote;
 pub mod stream;
 pub mod time;

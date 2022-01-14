@@ -5,7 +5,8 @@ An experimental Discord bot using Serenity.
 - Emote Commands: `/say`, `/react`, `/emotes`, `/emote-registry`
 - Stream Notification Embeds: `/stream`
 - Timezone Info: `/time`
-- Voice Channel Renaming: `/voice`, `/default-voice`
+- Voice Channel Renaming: `/voice`
+- Miscellaneous: `/config`
 
 # Files
 - `voidbot`: The executable file of the bot.
@@ -15,6 +16,7 @@ An experimental Discord bot using Serenity.
 # Environment Variables
 - `DISCORD_TOKEN`: The token for your bot. (*required*)
 - `DISCORD_CLIENT_ID`: The client ID for your bot. (*required*)
+- `DISCORD_BOT_OWNER`: The user ID of the bot's owner (*optional* (**required in dev mode**))
 
 ## Debug Environment Variables
 - `DEV_GUILD`: The guild to test your slash commands on in dev mode. (*required*)
