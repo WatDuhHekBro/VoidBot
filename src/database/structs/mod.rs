@@ -2,6 +2,5 @@
 // Struct::read(&db, id) - Build an object around a row in a table
 // object.write(&db) - Commit changes to database and deallocate the existing reference
 pub mod default_vc_names;
-pub mod emote_registry;
 pub mod guild;
 pub mod user;

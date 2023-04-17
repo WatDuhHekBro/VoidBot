@@ -14,7 +14,7 @@ impl EventHandler for Handler {
                 self.handle_slash_commands(&ctx, interaction).await;
             }
             Interaction::MessageComponent(_) => {}
-            Interaction::Ping(_) => {}
+            _ => {}
         };
     }
 

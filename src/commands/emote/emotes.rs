@@ -1,19 +1,21 @@
 use serenity::{
     builder::CreateApplicationCommand,
-    model::interactions::{
-        application_command::{
-            ApplicationCommandInteraction, ApplicationCommandInteractionDataOption,
-            ApplicationCommandOptionType,
+    model::application::{
+        command::CommandOptionType,
+        interaction::{
+            application_command::{ApplicationCommandInteraction, CommandDataOption},
+            InteractionResponseType,
         },
-        InteractionResponseType,
     },
     prelude::*,
 };
 
+use serenity::cache::Cache;
+
 /////////////////////
 // Command Outline //
 /////////////////////
-// emotes <regex: string> (<is-case-sensitive: boolean>)
+// emotes (<pattern: string>) (<is-case-sensitive: boolean>)
 
 pub const COMMAND_NAME: &str = "emotes";
 
@@ -23,10 +25,9 @@ pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationC
         .description("Lists out all the emotes the bot currently has access to")
         .create_option(|option| {
             option
-                .name("regex")
-                .description("The pattern to filter emotes by")
-                .kind(ApplicationCommandOptionType::String)
-                .required(true)
+                .name("pattern")
+                .description("The regex pattern to filter emotes by")
+                .kind(CommandOptionType::String)
         })
         .create_option(|option| {
             option
@@ -34,15 +35,17 @@ pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationC
                 .description(
                     "Whether or not to check for case-sensitivity (not case-sensitive by default)",
                 )
-                .kind(ApplicationCommandOptionType::Boolean)
+                .kind(CommandOptionType::Boolean)
         })
 }
 
 pub async fn handle(
     ctx: &Context,
     interaction: &ApplicationCommandInteraction,
-    _options: &Vec<ApplicationCommandInteractionDataOption>,
+    options: &Vec<CommandDataOption>,
 ) -> Result<(), serenity::Error> {
+    let a = ctx.cache.guilds();
+    println!("{options:?}");
     interaction
         .create_interaction_response(&ctx.http, |response| {
             response

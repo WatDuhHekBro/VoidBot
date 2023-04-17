@@ -1,11 +1,11 @@
 use serenity::{
     builder::CreateApplicationCommand,
-    model::interactions::{
-        application_command::{
-            ApplicationCommandInteraction, ApplicationCommandInteractionDataOption,
-            ApplicationCommandOptionType,
+    model::application::{
+        command::CommandOptionType,
+        interaction::{
+            application_command::{ApplicationCommandInteraction, CommandDataOption},
+            InteractionResponseType,
         },
-        InteractionResponseType,
     },
     prelude::*,
 };
@@ -20,14 +20,14 @@ pub const COMMAND_NAME: &str = "say";
 pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name(COMMAND_NAME)
-        .description("Sends a message in your place with any emote you specify in /slashes/")
+        .description("[yeet tmp] Sends a message in your place with any emote you specify in /slashes/")
         .create_option(|option| {
             option
                 .name("message")
                 .description(
                     r#"The message to parse ("//" = slash, "\" = new line, "\\" = backslash)"#,
                 )
-                .kind(ApplicationCommandOptionType::String)
+                .kind(CommandOptionType::String)
                 .required(true)
         })
 }
@@ -35,13 +35,15 @@ pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationC
 pub async fn handle(
     ctx: &Context,
     interaction: &ApplicationCommandInteraction,
-    _options: &Vec<ApplicationCommandInteractionDataOption>,
+    _options: &Vec<CommandDataOption>,
 ) -> Result<(), serenity::Error> {
     interaction
         .create_interaction_response(&ctx.http, |response| {
             response
                 .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| message.content("/say"))
+                .interaction_response_data(|message| {
+                    message.content("asdf <:asdf:992812937876082748> <:asdf:1055589478594527345> <a:asdf:754077074951766280> <a:asdf:687071462154174663> <a:asdf:834292642158346271> <a:asdf:1055591264592072705>")
+                })
         })
         .await
 }

@@ -8,7 +8,8 @@ edition = "2021"
 [dependencies]
 base64 = "0.13.0"
 dotenv = "0.15.0"
-futures = "0.3.19"
-rusqlite = { version = "0.26.3", features = ["bundled"] }
-serenity = { version = "0.10.9", default-features = false, features = ["client", "gateway", "model", "rustls_backend", "unstable_discord_api"] }
-tokio = { version = "1.15.0", features = ["macros", "rt-multi-thread"] }
+futures = "0.3.25"
+regex = "1"
+rusqlite = { version = "0.28.0", features = ["bundled"] }
+serenity = { version = "0.11", default-features = false, features = ["cache", "client", "gateway", "model", "rustls_backend", "unstable_discord_api"] }
+tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread"] }

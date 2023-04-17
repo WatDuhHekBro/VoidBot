@@ -1,11 +1,11 @@
 use serenity::{
     builder::CreateApplicationCommand,
-    model::interactions::{
-        application_command::{
-            ApplicationCommandInteraction, ApplicationCommandInteractionDataOption,
-            ApplicationCommandOptionType,
+    model::application::{
+        command::CommandOptionType,
+        interaction::{
+            application_command::{ApplicationCommandInteraction, CommandDataOption},
+            InteractionResponseType,
         },
-        InteractionResponseType,
     },
     prelude::*,
 };
@@ -25,21 +25,21 @@ pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationC
             option
                 .name("emotes")
                 .description("The list of space-separated emote names to react with")
-                .kind(ApplicationCommandOptionType::String)
+                .kind(CommandOptionType::String)
                 .required(true)
         })
         .create_option(|option| {
             option
                 .name("target")
                 .description("The message to target (distance / message ID / channel-message ID pair / message link)")
-                .kind(ApplicationCommandOptionType::String)
+                .kind(CommandOptionType::String)
         })
 }
 
 pub async fn handle(
     ctx: &Context,
     interaction: &ApplicationCommandInteraction,
-    _options: &Vec<ApplicationCommandInteractionDataOption>,
+    _options: &Vec<CommandDataOption>,
 ) -> Result<(), serenity::Error> {
     interaction
         .create_interaction_response(&ctx.http, |response| {

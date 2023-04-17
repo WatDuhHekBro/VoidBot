@@ -1,11 +1,11 @@
-use dotenv::dotenv;
-use serenity::{client::bridge::gateway::GatewayIntents, prelude::*};
-use std::env;
-
 mod commands;
 mod database;
 mod modules;
+
+use dotenv::dotenv;
 use modules::event_handler::Handler;
+use serenity::prelude::*;
+use std::env;
 
 #[tokio::main]
 async fn main() {
@@ -33,10 +33,9 @@ async fn main() {
             .expect("Expected decoded token slice to be an integer.")
     };
 
-    let mut client = Client::builder(token)
+    let mut client = Client::builder(token, GatewayIntents::empty())
         .event_handler(Handler)
         .application_id(application_id)
-        .intents(GatewayIntents::empty())
         .await
         .expect("Error creating client");
 

@@ -3,16 +3,16 @@ use std::env;
 use serenity::{
     builder::CreateApplicationCommands,
     model::{
+        application::{
+            command::{Command, CommandOptionType},
+            interaction::{
+                application_command::ApplicationCommandInteraction, InteractionResponseType,
+                MessageFlags,
+            },
+        },
         gateway::Ready,
         guild::Guild,
-        id::{CommandId, GuildId},
-        interactions::{
-            application_command::{
-                ApplicationCommand, ApplicationCommandInteraction, ApplicationCommandOptionType,
-                ApplicationCommandPermissionType,
-            },
-            InteractionApplicationCommandCallbackDataFlags, InteractionResponseType,
-        },
+        id::GuildId,
     },
     prelude::*,
 };
@@ -27,34 +27,6 @@ fn set_global_commands(commands: &mut CreateApplicationCommands) -> &mut CreateA
         .create_application_command(|command| commands::emote::say::define(command))
         .create_application_command(|command| commands::emote::react::define(command))
         .create_application_command(|command| commands::emote::emotes::define(command))
-        .create_application_command(|command| commands::emote::emote_registry::define(command))
-        // Stream Embeds
-        .create_application_command(|command| commands::stream::define(command))
-        // Timezone Info
-        .create_application_command(|command| commands::time::define(command))
-        // Voice Channel Renaming
-        .create_application_command(|command| commands::voice::define(command))
-        // Miscellaneous
-        .create_application_command(|command| commands::config::define(command))
-}
-
-async fn set_command_permission(ctx: &Context, guild: GuildId, command: CommandId, users: &[u64]) {
-    // Even if the same user ID is put, later calls to create_permission will simply override the previous calls.
-    guild
-        .create_application_command_permission(&ctx.http, command, |permissions| {
-            for user_id in users {
-                permissions.create_permission(|permission| {
-                    permission
-                        .id(*user_id)
-                        .kind(ApplicationCommandPermissionType::User)
-                        .permission(true)
-                });
-            }
-
-            permissions
-        })
-        .await
-        .expect("Error registering command permissions.");
 }
 
 impl Handler {
@@ -85,24 +57,24 @@ impl Handler {
         interaction: &ApplicationCommandInteraction,
     ) {
         let command = interaction.data.name.as_str();
-        let mut subcommand: Option<&str> = None;
+        //let mut subcommand: Option<&str> = None;
         let mut _subcommand_group: Option<&str> = None;
         let mut options = &interaction.data.options;
 
         // Gather subcommand and subcommand group info if it exists
         if let Some(option) = interaction.data.options.get(0) {
-            if option.kind == ApplicationCommandOptionType::SubCommand {
-                subcommand = Some(option.name.as_str());
+            if option.kind == CommandOptionType::SubCommand {
+                //subcommand = Some(option.name.as_str());
                 options = &option.options;
-            } else if option.kind == ApplicationCommandOptionType::SubCommandGroup {
+            } else if option.kind == CommandOptionType::SubCommandGroup {
                 _subcommand_group = Some(option.name.as_str());
                 let option = option
                     .options
                     .get(0)
                     .expect("Subcommand Groups must have exactly one nested option");
 
-                if option.kind == ApplicationCommandOptionType::SubCommand {
-                    subcommand = Some(option.name.as_str());
+                if option.kind == CommandOptionType::SubCommand {
+                    //subcommand = Some(option.name.as_str());
                     options = &option.options;
                 } else {
                     panic!("The option of a subcommand group isn't a subcommand");
@@ -122,55 +94,6 @@ impl Handler {
             commands::emote::emotes::COMMAND_NAME => {
                 commands::emote::emotes::handle(ctx, interaction, options).await
             }
-            commands::emote::emote_registry::COMMAND_NAME => {
-                commands::emote::emote_registry::handle(ctx, interaction, options).await
-            }
-            // Stream Embeds
-            commands::stream::COMMAND_NAME => {
-                commands::stream::handle(ctx, interaction, options).await
-            }
-            // Timezone Info
-            commands::time::COMMAND_NAME => {
-                let subcommand = subcommand.expect("Expected a subcommand for /time");
-
-                match subcommand {
-                    commands::time::show::COMMAND_NAME => {
-                        commands::time::show::handle(ctx, interaction, options).await
-                    }
-                    commands::time::setup::COMMAND_NAME => {
-                        commands::time::setup::handle(ctx, interaction, options).await
-                    }
-                    commands::time::delete::COMMAND_NAME => {
-                        commands::time::delete::handle(ctx, interaction, options).await
-                    }
-                    commands::time::utc::COMMAND_NAME => {
-                        commands::time::utc::handle(ctx, interaction, options).await
-                    }
-                    commands::time::dst_info::COMMAND_NAME => {
-                        commands::time::dst_info::handle(ctx, interaction, options).await
-                    }
-                    _ => reply_invalid_command(ctx, interaction).await,
-                }
-            }
-            // Voice Channel Renaming
-            commands::voice::COMMAND_NAME => {
-                commands::voice::handle(ctx, interaction, options).await
-            }
-            // Miscellaneous
-            commands::config::COMMAND_NAME => {
-                let subcommand = subcommand.expect("Expected a subcommand for /config");
-
-                match subcommand {
-                    commands::config::default_voice::COMMAND_NAME => {
-                        commands::config::default_voice::handle(ctx, interaction, options).await
-                    }
-                    commands::config::stream_embeds_channel::COMMAND_NAME => {
-                        commands::config::stream_embeds_channel::handle(ctx, interaction, options)
-                            .await
-                    }
-                    _ => reply_invalid_command(ctx, interaction).await,
-                }
-            }
             _ => reply_invalid_command(ctx, interaction).await,
         }
         .expect("Error replying to slash command.");
@@ -178,16 +101,14 @@ impl Handler {
 }
 
 #[allow(dead_code)]
-async fn register_commands(ctx: &Context) -> Vec<ApplicationCommand> {
-    ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
-        set_global_commands(commands)
-    })
-    .await
-    .expect("Error on registering slash commands in production mode.")
+async fn register_commands(ctx: &Context) -> Vec<Command> {
+    Command::set_global_application_commands(&ctx.http, |commands| set_global_commands(commands))
+        .await
+        .expect("Error on registering slash commands in production mode.")
 }
 
 #[cfg(debug_assertions)]
-async fn register_dev_commands(ctx: &Context) -> Vec<ApplicationCommand> {
+async fn register_dev_commands(ctx: &Context) -> Vec<Command> {
     // Clear existing slash commands based on the DEV_CLEAR environment variable
     // This should be called before a potential error for DEV_GUILD so you can clear your dev instance once you've finished up your changes
     if let Ok(guilds) = env::var("DEV_CLEAR") {
@@ -195,7 +116,7 @@ async fn register_dev_commands(ctx: &Context) -> Vec<ApplicationCommand> {
 
         for guild in guilds {
             if guild == "*" {
-                ApplicationCommand::set_global_application_commands(&ctx.http, |commands| commands)
+                Command::set_global_application_commands(&ctx.http, |commands| commands)
                     .await
                     .expect("Error on clearing global slash commands.");
 
@@ -238,7 +159,7 @@ async fn register_dev_commands(ctx: &Context) -> Vec<ApplicationCommand> {
 }
 
 #[allow(dead_code)]
-async fn register_permissions(ctx: &Context, ready: &Ready, commands: &[ApplicationCommand]) {
+async fn register_permissions(ctx: &Context, ready: &Ready, commands: &[Command]) {
     let mut bot_owner: Option<u64> = None;
 
     if let Some(bot_owner_env) = env::var("DISCORD_BOT_OWNER").ok() {
@@ -249,22 +170,9 @@ async fn register_permissions(ctx: &Context, ready: &Ready, commands: &[Applicat
         );
     }
 
-    // While the permission has to be applied to every guild, the permission is based on one global command.
-    let mut config_command: Option<CommandId> = None;
-
-    // Loop through commands and find the entry where the command is /config
-    for command in commands {
-        if command.name.as_str() == commands::config::COMMAND_NAME {
-            config_command = Some(command.id);
-        }
-    }
-
-    let config_command =
-        config_command.expect("/config command not found when registering permissions.");
-
     // The GuildStatus vector seems to be Offline(GuildUnavailable) every time, so this fetches PartialGuilds
     for guild in &ready.guilds {
-        let guild_id = guild.id();
+        let guild_id = guild.id;
         let guild = Guild::get(&ctx.http, guild_id).await.expect(
             "Expected all guilds to be available while fetching partial data during ready phase.",
         );
@@ -275,13 +183,11 @@ async fn register_permissions(ctx: &Context, ready: &Ready, commands: &[Applicat
         } else {
             vec![guild_owner]
         };
-
-        set_command_permission(ctx, guild_id, config_command, &user_ids[..]).await;
     }
 }
 
 #[cfg(debug_assertions)]
-async fn register_dev_permissions(ctx: &Context, commands: &[ApplicationCommand]) {
+async fn register_dev_permissions(ctx: &Context, commands: &[Command]) {
     let dev_guild = GuildId(
         env::var("DEV_GUILD")
             .expect("Expected environment variable DEV_GUILD")
@@ -293,23 +199,6 @@ async fn register_dev_permissions(ctx: &Context, commands: &[ApplicationCommand]
         .expect("Environment variable DISCORD_BOT_OWNER required for dev mode")
         .parse()
         .expect("DISCORD_BOT_OWNER must be an integer");
-
-    let mut config_command: Option<CommandId> = None;
-
-    // Loop through commands and find the entry where the command is /config
-    for command in commands {
-        if command.name.as_str() == commands::config::COMMAND_NAME {
-            config_command = Some(command.id);
-        }
-    }
-
-    set_command_permission(
-        ctx,
-        dev_guild,
-        config_command.expect("/config command not found when registering permissions."),
-        &[bot_owner],
-    )
-    .await;
 }
 
 async fn reply_invalid_command(
@@ -323,7 +212,7 @@ async fn reply_invalid_command(
             .interaction_response_data(|message| {
                 message
                     .content("**Error:** Invalid command name! This probably means that the command definitions haven't been updated yet or there's a glaring oversight in the code.")
-                    .flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL)
+                    .flags(MessageFlags::EPHEMERAL)
             })
     })
     .await
