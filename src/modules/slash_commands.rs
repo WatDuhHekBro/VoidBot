@@ -11,7 +11,6 @@ use serenity::{
             },
         },
         gateway::Ready,
-        guild::Guild,
         id::GuildId,
     },
     prelude::*,
@@ -24,9 +23,9 @@ use crate::modules::event_handler::Handler;
 fn set_global_commands(commands: &mut CreateApplicationCommands) -> &mut CreateApplicationCommands {
     commands
         // Emote Commands
-        .create_application_command(|command| commands::emote::say::define(command))
-        .create_application_command(|command| commands::emote::react::define(command))
-        .create_application_command(|command| commands::emote::emotes::define(command))
+        .create_application_command(|command| commands::say::define(command))
+        .create_application_command(|command| commands::react::define(command))
+        .create_application_command(|command| commands::emotes::define(command))
 }
 
 impl Handler {
@@ -43,12 +42,6 @@ impl Handler {
         let commands = register_commands(ctx).await;
         #[cfg(debug_assertions)]
         let commands = register_dev_commands(ctx).await;
-
-        // Then register command permissions
-        #[cfg(not(debug_assertions))]
-        register_permissions(ctx, ready, &commands).await;
-        #[cfg(debug_assertions)]
-        register_dev_permissions(ctx, &commands).await;
     }
 
     pub async fn handle_slash_commands(
@@ -85,14 +78,12 @@ impl Handler {
         // Find the appropriate handler then execute it
         match command {
             // Emote Commands
-            commands::emote::say::COMMAND_NAME => {
-                commands::emote::say::handle(ctx, interaction, options).await
+            commands::say::COMMAND_NAME => commands::say::handle(ctx, interaction, options).await,
+            commands::react::COMMAND_NAME => {
+                commands::react::handle(ctx, interaction, options).await
             }
-            commands::emote::react::COMMAND_NAME => {
-                commands::emote::react::handle(ctx, interaction, options).await
-            }
-            commands::emote::emotes::COMMAND_NAME => {
-                commands::emote::emotes::handle(ctx, interaction, options).await
+            commands::emotes::COMMAND_NAME => {
+                commands::emotes::handle(ctx, interaction, options).await
             }
             _ => reply_invalid_command(ctx, interaction).await,
         }
@@ -156,49 +147,6 @@ async fn register_dev_commands(ctx: &Context) -> Vec<Command> {
     println!("Registered slash commands in dev mode.");
 
     commands
-}
-
-#[allow(dead_code)]
-async fn register_permissions(ctx: &Context, ready: &Ready, commands: &[Command]) {
-    let mut bot_owner: Option<u64> = None;
-
-    if let Some(bot_owner_env) = env::var("DISCORD_BOT_OWNER").ok() {
-        bot_owner = Some(
-            bot_owner_env
-                .parse()
-                .expect("DISCORD_BOT_OWNER must be an integer"),
-        );
-    }
-
-    // The GuildStatus vector seems to be Offline(GuildUnavailable) every time, so this fetches PartialGuilds
-    for guild in &ready.guilds {
-        let guild_id = guild.id;
-        let guild = Guild::get(&ctx.http, guild_id).await.expect(
-            "Expected all guilds to be available while fetching partial data during ready phase.",
-        );
-        let guild_owner = guild.owner_id.0;
-
-        let user_ids = if let Some(bot_owner) = bot_owner {
-            vec![bot_owner, guild_owner]
-        } else {
-            vec![guild_owner]
-        };
-    }
-}
-
-#[cfg(debug_assertions)]
-async fn register_dev_permissions(ctx: &Context, commands: &[Command]) {
-    let dev_guild = GuildId(
-        env::var("DEV_GUILD")
-            .expect("Expected environment variable DEV_GUILD")
-            .parse()
-            .expect("DEV_GUILD must be an integer"),
-    );
-
-    let bot_owner: u64 = env::var("DISCORD_BOT_OWNER")
-        .expect("Environment variable DISCORD_BOT_OWNER required for dev mode")
-        .parse()
-        .expect("DISCORD_BOT_OWNER must be an integer");
 }
 
 async fn reply_invalid_command(

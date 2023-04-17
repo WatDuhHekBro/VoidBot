@@ -1,5 +1,4 @@
 mod commands;
-mod database;
 mod modules;
 
 use dotenv::dotenv;
@@ -10,7 +9,6 @@ use std::env;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    database::core::migrate_database();
 
     let token = env::var("DISCORD_TOKEN").expect("Expected environment variable DISCORD_TOKEN");
 

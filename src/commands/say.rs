@@ -20,7 +20,9 @@ pub const COMMAND_NAME: &str = "say";
 pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name(COMMAND_NAME)
-        .description("[yeet tmp] Sends a message in your place with any emote you specify in /slashes/")
+        .description(
+            "[yeet tmp] Sends a message in your place with any emote you specify in /slashes/",
+        )
         .create_option(|option| {
             option
                 .name("message")

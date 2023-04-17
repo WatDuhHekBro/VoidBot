@@ -1,7 +1,5 @@
 use serenity::{
-    async_trait,
-    model::{gateway::Ready, interactions::Interaction},
-    prelude::*,
+    async_trait, model::application::interaction::Interaction, model::gateway::Ready, prelude::*,
 };
 
 pub struct Handler;
