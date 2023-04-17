@@ -1,3 +1,4 @@
+use crate::modules::shared_data::SharedData;
 use serenity::{
     builder::CreateApplicationCommand,
     model::application::{
@@ -9,8 +10,6 @@ use serenity::{
     },
     prelude::*,
 };
-
-use serenity::cache::Cache;
 
 /////////////////////
 // Command Outline //
@@ -44,13 +43,23 @@ pub async fn handle(
     interaction: &ApplicationCommandInteraction,
     options: &Vec<CommandDataOption>,
 ) -> Result<(), serenity::Error> {
-    let a = ctx.cache.guilds();
-    println!("{options:?}");
+    let data = ctx.data.read().await;
+
     interaction
         .create_interaction_response(&ctx.http, |response| {
-            response
-                .kind(InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|message| message.content("/emotes"))
+            if let Some(data) = data.get::<SharedData>() {
+                let emote_cache = &data.emote_cache;
+                println!("[CACHE] {emote_cache:?}");
+                println!("[OPTIONS] {options:?}");
+
+                response
+                    .kind(InteractionResponseType::ChannelMessageWithSource)
+                    .interaction_response_data(|message| message.content("/emotes"))
+            } else {
+                response
+                    .kind(InteractionResponseType::ChannelMessageWithSource)
+                    .interaction_response_data(|message| message.content("The bot failed to secure the lock on the emote cache. Please contact the developer (the emote cache might not have been initialized)."))
+            }
         })
         .await
 }

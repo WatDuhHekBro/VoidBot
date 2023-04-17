@@ -31,7 +31,8 @@ async fn main() {
             .expect("Expected decoded token slice to be an integer.")
     };
 
-    let mut client = Client::builder(token, GatewayIntents::empty())
+    // In order for the emote cache to update, the GUILD_EMOJIS_UPDATE intent must be active.
+    let mut client = Client::builder(token, GatewayIntents::GUILD_EMOJIS_AND_STICKERS)
         .event_handler(Handler)
         .application_id(application_id)
         .await

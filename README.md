@@ -1,6 +1,6 @@
 # VoidBot
 
-An experimental Discord bot using Serenity. Streamlines the process of ways to use any emotes the bot has access to. Commands: `/say`, `/react`, `/emotes`
+An experimental Discord bot using Serenity. Streamlines the process of ways to use any emotes the bot has access to.
 
 # Files
 
