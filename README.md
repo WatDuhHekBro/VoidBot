@@ -1,6 +1,6 @@
 # VoidBot
 
-An experimental Discord bot using Serenity. Streamlines the process of ways to use any emotes the bot has access to.
+An experimental Discord bot using Serenity. Contains a proof of concept for streamlining the process of using any emotes the bot has access to, without having to be in the same servers as the bot.
 
 # Files
 

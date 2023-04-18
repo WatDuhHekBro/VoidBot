@@ -1,4 +1,4 @@
-use crate::modules::shared_data::SharedData;
+use crate::modules::shared_data::EmoteCache;
 use serenity::{
     async_trait,
     model::{
@@ -26,6 +26,7 @@ impl EventHandler for Handler {
     }
 
     // All current_state contains is the updated state of all emotes on the server, it can replace the one in the emote cache.
+    // To avoid the gateway intent, maybe have a /refresh command to rebuild the emote cache with a global cooldown.
     async fn guild_emojis_update(
         &self,
         ctx: Context,
@@ -38,8 +39,7 @@ impl EventHandler for Handler {
         // Then store the new state into the emote cache.
         let mut data = ctx.data.write().await;
 
-        if let Some(data) = data.get_mut::<SharedData>() {
-            let emote_cache = &mut data.emote_cache;
+        if let Some(emote_cache) = data.get_mut::<EmoteCache>() {
             emote_cache.insert(guild_id, current_state);
         } else {
             println!("Error: Failed to secure write lock on shared data while receiving an emote update!")
@@ -79,7 +79,7 @@ impl EventHandler for Handler {
         }
 
         let mut data = ctx.data.write().await;
-        data.insert::<SharedData>(SharedData { emote_cache });
+        data.insert::<EmoteCache>(emote_cache);
 
         println!("Finished creating emote cache...");
     }

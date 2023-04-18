@@ -14,6 +14,8 @@ use serenity::{
 // Command Outline //
 /////////////////////
 // say <message: string>
+// Create commands to delete/edit messages
+// Create some way to confirm your message without breaking continuity of who used /say, /check-emotes?
 
 pub const COMMAND_NAME: &str = "say";
 
@@ -35,7 +37,7 @@ pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationC
 pub async fn handle(
     ctx: &Context,
     interaction: &ApplicationCommandInteraction,
-    _options: &Vec<CommandDataOption>,
+    _options: &[CommandDataOption],
 ) -> Result<(), serenity::Error> {
     interaction
         .create_interaction_response(&ctx.http, |response| {
@@ -46,4 +48,37 @@ pub async fn handle(
                 })
         })
         .await
+}
+
+fn parse_message_with_emotes(message: String) -> String {
+    let mut result = String::new();
+
+    for c in message.chars() {
+        //
+    }
+
+    result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_message_with_emotes;
+
+    #[test]
+    fn double_slash_input() {
+        let result = parse_message_with_emotes(String::from("Hello //world"));
+        assert_eq!(result, String::from("Hello /world"))
+    }
+
+    #[test]
+    fn newline_input() {
+        let result = parse_message_with_emotes(String::from(r#"Hello \world"#));
+        assert_eq!(result, String::from("Hello \nworld"))
+    }
+
+    #[test]
+    fn backslash_input() {
+        let result = parse_message_with_emotes(String::from(r#"Hello \\world"#));
+        assert_eq!(result, String::from(r#"Hello \world"#))
+    }
 }

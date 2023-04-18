@@ -14,6 +14,7 @@ use serenity::{
 // Command Outline //
 /////////////////////
 // react <emotes: string> (<target: string>)
+// Have "confirm" boolean option to make message ephemeral and show emotes to react with before reacting with it?
 
 pub const COMMAND_NAME: &str = "react";
 
@@ -39,7 +40,7 @@ pub fn define(command: &mut CreateApplicationCommand) -> &mut CreateApplicationC
 pub async fn handle(
     ctx: &Context,
     interaction: &ApplicationCommandInteraction,
-    _options: &Vec<CommandDataOption>,
+    _options: &[CommandDataOption],
 ) -> Result<(), serenity::Error> {
     interaction
         .create_interaction_response(&ctx.http, |response| {

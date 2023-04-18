@@ -10,6 +10,5 @@ base64 = "0.13.0"
 dotenv = "0.15.0"
 futures = "0.3.25"
 regex = "1"
-rusqlite = { version = "0.28.0", features = ["bundled"] }
 serenity = { version = "0.11", default-features = false, features = ["cache", "client", "gateway", "model", "rustls_backend", "unstable_discord_api"] }
 tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread"] }

@@ -4,11 +4,12 @@ use serenity::{
 };
 use std::collections::HashMap;
 
-#[derive(Debug)]
-pub struct SharedData {
-    pub emote_cache: HashMap<GuildId, Vec<Emoji>>,
-}
+// Each struct defined will have its own separate data, so there's no need to create one struct with everything.
+// impl TypeMapKey for NewStruct
 
-impl TypeMapKey for SharedData {
-    type Value = SharedData;
+#[derive(Debug)]
+pub struct EmoteCache;
+
+impl TypeMapKey for EmoteCache {
+    type Value = HashMap<GuildId, Vec<Emoji>>;
 }

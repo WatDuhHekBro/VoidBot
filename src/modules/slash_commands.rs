@@ -77,17 +77,27 @@ impl Handler {
 
         // Find the appropriate handler then execute it
         match command {
-            // Emote Commands
             commands::say::COMMAND_NAME => commands::say::handle(ctx, interaction, options).await,
             commands::react::COMMAND_NAME => {
                 commands::react::handle(ctx, interaction, options).await
             }
             commands::emotes::COMMAND_NAME => {
+                //interaction.defer(&ctx.http).await
                 commands::emotes::handle(ctx, interaction, options).await
             }
             _ => reply_invalid_command(ctx, interaction).await,
         }
         .expect("Error replying to slash command.");
+
+        // Then execute any deferred updates
+        match command {
+            commands::emotes::COMMAND_NAME => {
+                commands::emotes::handle_deferred(ctx, interaction, options)
+                    .await
+                    .expect("Error replying to slash command.");
+            }
+            _ => {}
+        };
     }
 }
 
@@ -122,10 +132,9 @@ async fn register_dev_commands(ctx: &Context) -> Vec<Command> {
                 guild
                     .set_application_commands(&ctx.http, |commands| commands)
                     .await
-                    .expect(&format!(
-                        "Error on clearing guild slash commands for {}.",
-                        guild
-                    ));
+                    .unwrap_or_else(|_| {
+                        panic!("Error on clearing guild slash commands for {guild}.")
+                    });
 
                 println!("Cleared guild slash commands for {}.", guild);
             }
