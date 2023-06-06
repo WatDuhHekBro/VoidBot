@@ -13,3 +13,16 @@ An experimental Discord bot using Serenity. Contains a proof of concept for stre
 - `DISCORD_APPLICATION_ID`: The application ID for your bot. Automatically derived from your bot's token, but can be provided as a manual override in case your application ID doesn't match your bot's client ID. (_optional_)
 - `DEV_GUILD`: The guild to test your slash commands on in dev mode. (_required_)
 - `DEV_CLEAR`: A list of comma-separated guilds to clear slash commands from. Set to `*` to clear global slash commands. (_optional_)
+
+# List
+
+## Commands
+
+- `/list-emotes`: Either regex or distance-based search
+
+## Apps
+
+### Message
+
+- Create a react prompt to that specific message
+- Edit or delete a proxy message via `/say`

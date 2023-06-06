@@ -1,9 +1,10 @@
 mod commands;
 mod modules;
+mod util;
 
 use dotenv::dotenv;
 use modules::event_handler::Handler;
-use serenity::prelude::*;
+use serenity::{prelude::*, utils::token};
 use std::env;
 
 #[tokio::main]
@@ -19,16 +20,10 @@ async fn main() {
             .parse()
             .expect("DISCORD_APPLICATION_ID must be an integer")
     } else {
-        let index = token
-            .find('.')
-            .expect("A proper bot token must consist of three parts separated by periods.");
-        let client_id = &token[..index];
-        let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
-        let client_id = base64::decode_config(client_id, base64_config).unwrap();
-        std::str::from_utf8(&client_id)
-            .expect("Expected decoded token slice to be UTF-8.")
-            .parse()
-            .expect("Expected decoded token slice to be an integer.")
+        let Some((id, _)) = token::parse(&token) else {
+            panic!("The token you provided is invalid.");
+        };
+        id.0
     };
 
     // In order for the emote cache to update, the GUILD_EMOJIS_UPDATE intent must be active.

@@ -26,6 +26,7 @@ fn set_global_commands(commands: &mut CreateApplicationCommands) -> &mut CreateA
         .create_application_command(|command| commands::say::define(command))
         .create_application_command(|command| commands::react::define(command))
         .create_application_command(|command| commands::emotes::define(command))
+        .create_application_command(|command| commands::react::define_menu(command))
 }
 
 impl Handler {
@@ -84,6 +85,9 @@ impl Handler {
             commands::emotes::COMMAND_NAME => {
                 //interaction.defer(&ctx.http).await
                 commands::emotes::handle(ctx, interaction, options).await
+            }
+            commands::react::MESSAGE_MENU_NAME => {
+                commands::react::handle_menu(ctx, interaction, options).await
             }
             _ => reply_invalid_command(ctx, interaction).await,
         }

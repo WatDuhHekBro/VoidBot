@@ -1,13 +1,15 @@
-use crate::modules::shared_data::EmoteCache;
+use crate::{modules::shared_data::EmoteCache, util::get_message_ref};
 use serenity::{
     async_trait,
     model::{
-        application::interaction::Interaction,
+        application::interaction::{Interaction, InteractionResponseType, MessageFlags},
+        channel::Message,
         gateway::Ready,
         id::GuildId,
         prelude::{Emoji, EmojiId},
     },
     prelude::*,
+    utils::ArgumentConvert,
 };
 use std::collections::HashMap;
 
@@ -21,6 +23,51 @@ impl EventHandler for Handler {
                 self.handle_slash_commands(&ctx, interaction).await;
             }
             Interaction::MessageComponent(_) => {}
+            Interaction::ModalSubmit(interaction) => {
+                // Get the message info and emotes to react with
+                //let c = &interaction.data.components;
+                let parsed = get_message_ref(&interaction.data.custom_id); // react-query=<channel>-<message>
+
+                // Then reply to the resolved message
+                let reply = match parsed {
+                    Some((channel, message)) => {
+                        let message = Message::convert(
+                            &ctx,
+                            None,
+                            Some(channel),
+                            message.to_string().as_str(),
+                        )
+                        .await
+                        .unwrap();
+
+                        //let emote = EmojiId::from(1055589478594527345);
+                        let emote = Emoji::convert(
+                            &ctx,
+                            //Some(GuildId::from(985682698565718086)),
+                            None,
+                            None,
+                            "https://cdn.discordapp.com/emojis/1055589478594527345.webp",
+                        )
+                        .await
+                        .unwrap();
+                        message.react(&ctx.http, emote).await.unwrap();
+                        "Reacting..."
+                    }
+                    None => "Failed to react to the message.",
+                };
+
+                // And then notify the user on if it was a success
+                interaction
+                    .create_interaction_response(&ctx.http, |response| {
+                        response
+                            .kind(InteractionResponseType::ChannelMessageWithSource)
+                            .interaction_response_data(|message| {
+                                message.content(reply).flags(MessageFlags::EPHEMERAL)
+                            })
+                    })
+                    .await
+                    .unwrap();
+            }
             _ => {}
         };
     }
