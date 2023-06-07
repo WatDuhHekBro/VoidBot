@@ -1,13 +1,5 @@
-# Project
-/target
+node_modules/
+out/
+tmp/
 .env
-
-# SQLite
-*.db
-*-journal
-*-wal
-*-shm
-
-# Windows
-*.exe
-desktop.ini
+voidbot

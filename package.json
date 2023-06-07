@@ -1,0 +1,45 @@
+{
+	"name": "voidbot",
+	"version": "0.6.9",
+	"main": "out/index.js",
+	"scripts": {
+		"start": "tsc-watch --onSuccess \"node .\"",
+		"build": "tsc",
+		"pkg": "pkg --targets node18-linux-x64 --output voidbot out/index.js",
+		"test": "jest",
+		"fmt": "prettier --write .",
+		"once": "tsc && node ."
+	},
+	"dependencies": {
+		"chalk": "^5.2.0",
+		"discord.js": "^14.11.0",
+		"dotenv": "^16.1.4",
+		"re2": "^1.19.0"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.2",
+		"@types/node": "^20.2.5",
+		"jest": "^29.5.0",
+		"pkg": "^5.8.1",
+		"prettier": "^2.8.8",
+		"ts-jest": "^29.1.0",
+		"tsc-watch": "^6.0.4",
+		"typescript": "^5.1.3"
+	},
+	"jest": {
+		"roots": [
+			"<rootDir>/src"
+		],
+		"testEnvironment": "node",
+		"testMatch": [
+			"**/*.test.+(ts|tsx)"
+		],
+		"transform": {
+			"^.+\\.(ts|tsx)$": "ts-jest"
+		}
+	},
+	"prettier": {
+		"tabWidth": 4,
+		"useTabs": true
+	}
+}

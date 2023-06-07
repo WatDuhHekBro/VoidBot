@@ -1,28 +1,34 @@
 # VoidBot
 
-An experimental Discord bot using Serenity. Contains a proof of concept for streamlining the process of using any emotes the bot has access to, without having to be in the same servers as the bot.
+An experimental Discord bot. Contains a proof of concept for streamlining the process of using any emotes the bot has access to, without having to be in the same servers as the bot.
+
+## Package Commands
+
+- `npm start`: Watches for changes in the codebase
+- `npm run build`: Runs the TypeScript compiler
+- `npm run pkg`: Packages the codebase into an executable for easy deployment
+- `npm test`: Executes unit tests via Jest
+- `npm run fmt`: Formats the code via Prettier
+- `npm run once`: Builds and runs the program, optionally with command line arguments (i.e. `npm run once register 12345`)
 
 # Files
 
-- `voidbot`: The executable file of the bot.
+- `voidbot`: The executable file of the bot. Possible parameters include:
+	- `register (<guild>)`: Register command definitions, either globally or on a specific guild
+	- `clean (<guild>)` Removes all existing slash commands, either globally or a specific guild
 - `.env`: An optional file to set environment variables while running the bot. Used for read-only configuration data like tokens.
 
 # Environment Variables
 
 - `DISCORD_TOKEN`: The token for your bot. (_required_)
-- `DISCORD_APPLICATION_ID`: The application ID for your bot. Automatically derived from your bot's token, but can be provided as a manual override in case your application ID doesn't match your bot's client ID. (_optional_)
-- `DEV_GUILD`: The guild to test your slash commands on in dev mode. (_required_)
-- `DEV_CLEAR`: A list of comma-separated guilds to clear slash commands from. Set to `*` to clear global slash commands. (_optional_)
 
-# List
+# Commands
 
-## Commands
-
+- `/say`: Send a message with emotes the bot has access to
+- `/react`: React to a message with emotes the bot has access to
 - `/list-emotes`: Either regex or distance-based search
 
-## Apps
-
-### Message
+## Apps (Message)
 
 - Create a react prompt to that specific message
 - Edit or delete a proxy message via `/say`
