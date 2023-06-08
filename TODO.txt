@@ -1,4 +1,3 @@
 - A refactor is absolutely necessary given the kludge of figuring things out
 - Dev mode to suppress logs?
-- /react
-- /list-emotes
+- /list-emotes backup (sends JSON file for backup purposes)

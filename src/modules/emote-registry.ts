@@ -4,9 +4,9 @@ import { client } from "..";
 import { levenshtein } from "../util/lib";
 
 // {id, name}
-type Emote = { id: string; name: string; ref: GuildEmoji };
+export type Emote = { id: string; name: string; ref: GuildEmoji };
 // {id, name, levenshtein distance}
-type DistanceEmote = {
+export type DistanceEmote = {
 	id: string;
 	name: string;
 	distance: number;
@@ -14,7 +14,7 @@ type DistanceEmote = {
 };
 
 // Maximum Levenshtein distance for an emote to be considered a suitable match candidate.
-const MAX_ACCEPTED_DISTANCE = 3.0;
+export const MAX_ACCEPTED_DISTANCE = 3.0;
 
 // Other patterns
 const unicodeEmojiRegex =

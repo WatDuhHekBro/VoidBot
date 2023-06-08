@@ -1,14 +1,15 @@
 {
 	"name": "voidbot",
-	"version": "0.6.9",
+	"version": "1.0.0",
 	"main": "out/index.js",
 	"scripts": {
-		"start": "tsc-watch --onSuccess \"node .\"",
-		"build": "tsc",
+		"start": "npm run genversion && tsc-watch --onSuccess \"node .\"",
+		"build": "npm run genversion && tsc",
 		"pkg": "pkg --targets node18-linux-x64 --output voidbot out/index.js",
 		"test": "jest",
 		"fmt": "prettier --write .",
-		"once": "tsc && node ."
+		"once": "npm run genversion && tsc && node .",
+		"genversion": "genversion --es6 --double --semi src/version.ts"
 	},
 	"dependencies": {
 		"chalk": "^4.1.2",
@@ -19,6 +20,7 @@
 	"devDependencies": {
 		"@types/jest": "^29.5.2",
 		"@types/node": "^20.2.5",
+		"genversion": "^3.1.1",
 		"jest": "^29.5.0",
 		"pkg": "^5.8.1",
 		"prettier": "^2.8.8",

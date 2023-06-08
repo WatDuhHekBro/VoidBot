@@ -1,6 +1,5 @@
 import {
 	ActionRowBuilder,
-	ChatInputCommandInteraction,
 	MessageContextMenuCommandInteraction,
 	ModalActionRowComponentBuilder,
 	ModalBuilder,
@@ -11,23 +10,6 @@ import {
 import { emoteRegistry } from "../modules/emote-registry";
 
 // Have "confirm" boolean option to make message ephemeral and show emotes to react with before reacting with it?
-
-export async function execute(interaction: ChatInputCommandInteraction) {
-	// You should check if the server owner has the reaction permission off by default first
-	if (
-		!interaction.guild?.members.me?.permissions.has(
-			PermissionsBitField.Flags.AddReactions
-		)
-	) {
-		return await interaction.reply({
-			content:
-				"**Error:** I don't have permissions to add reactions in the channel or server you tried to use this in!",
-			ephemeral: true,
-		});
-	}
-
-	await interaction.reply("react");
-}
 
 const ID_MENU = "react-query";
 const ID_MENU_INPUT = "react-query-input";

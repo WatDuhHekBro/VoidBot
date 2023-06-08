@@ -36,8 +36,7 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 # Commands
 
 - `/say`: Send a message with emotes the bot has access to
-- `/react`: React to a message with emotes the bot has access to
-- `/list-emotes`: Either regex or distance-based search
+- `/list-emotes`: Either an alphabetical list or regex or distance-based filters
 
 ## Apps (Message)
 

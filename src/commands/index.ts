@@ -5,56 +5,98 @@ import {
 	SlashCommandBuilder,
 } from "discord.js";
 import { client } from "..";
+import { MAX_ACCEPTED_DISTANCE } from "../modules/emote-registry";
+import { SORT_BY_ALPHA_ASC, SORT_BY_ALPHA_DESC } from "./list-emotes";
 
 // Command Names
 export const CMD_LSEMOTES = "list-emotes";
-export const CMD_REACT = "react";
+export const CMD_LSEMOTES_ALL = "all";
+export const CMD_LSEMOTES_QUERY = "query";
+export const CMD_LSEMOTES_REGEX = "regex";
 export const CMD_SAY = "say";
-export const MENU_MSG_REACT = "React with Emotes";
-export const MENU_MSG_SAY_EDIT = "Edit Proxy Message";
-export const MENU_MSG_SAY_DELETE = "Delete Proxy Message";
+export const MENU_MSG_REACT = "[React]";
+export const MENU_MSG_SAY_EDIT = "Proxy Message: Edit";
+export const MENU_MSG_SAY_DELETE = "Proxy Message: Delete";
 export const MENU_MSG_POKEMON = "Tackle";
 
 // Command Definitions
 export const commands = [
-	// list-emotes (<regex: string>) (<is-case-sensitive: boolean>)
+	// list-emotes all (<sort-by: string choices>)
+	// list-emotes query <query: string> (<levenshtein-threshold>: number (>= 0))
+	// list-emotes regex <pattern: string> (<is-case-sensitive: boolean>)
 	new SlashCommandBuilder()
 		.setName(CMD_LSEMOTES)
 		.setDescription(
 			"Lists out all the emotes the bot currently has access to"
 		)
-		.addStringOption((option) =>
-			option
-				.setName("regex")
-				.setDescription("The regex pattern to filter emotes by")
-		)
-		.addBooleanOption((option) =>
-			option
-				.setName("is-case-sensitive")
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setName(CMD_LSEMOTES_ALL)
 				.setDescription(
-					"Whether or not to check the pattern for case-sensitivity (false by default)"
+					"Displays a list of all available emotes without any filters"
+				)
+				.addStringOption((option) =>
+					option
+						.setName("sort-by")
+						.setDescription(
+							"Sorts the list by different metrics. (Default: Alphabetical (Ascending))"
+						)
+						.addChoices(
+							{
+								name: "Alphabetical (Ascending)",
+								value: SORT_BY_ALPHA_ASC,
+							},
+							{
+								name: "Alphabetical (Descending)",
+								value: SORT_BY_ALPHA_DESC,
+							}
+						)
 				)
 		)
-		.toJSON(),
-	// react <emotes: string> (<target: string>)
-	new SlashCommandBuilder()
-		.setName(CMD_REACT)
-		.setDescription(
-			"Reacts to the targeted message with any emotes the bot currently has access to"
-		)
-		.addStringOption((option) =>
-			option
-				.setName("emotes")
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setName(CMD_LSEMOTES_QUERY)
 				.setDescription(
-					"The list of space-separated emote names to react with"
+					"Filter the emote list through the default emote resolver, based on Levenshtein distance"
 				)
-				.setRequired(true)
+				.addStringOption((option) =>
+					option
+						.setName("query")
+						.setDescription("The query to filter emotes by")
+						.setRequired(true)
+				)
+				.addNumberOption((option) =>
+					option
+						.setName("levenshtein-threshold")
+						.setDescription(
+							`The likeness threshold of a query, with 0 being the strictest (Default: ${MAX_ACCEPTED_DISTANCE})`
+						)
+						.setMinValue(0)
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName("disable-threshold")
+						.setDescription(
+							"Disables filtering emotes by a threshold (Default: false)"
+						)
+				)
 		)
-		.addStringOption((option) =>
-			option
-				.setName("target")
-				.setDescription(
-					"The message to target (distance / message ID / channel-message ID pair / message link)"
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setName(CMD_LSEMOTES_REGEX)
+				.setDescription("Filter the emote list through a regex pattern")
+				.addStringOption((option) =>
+					option
+						.setName("pattern")
+						.setDescription("The regex pattern to filter emotes by")
+						.setRequired(true)
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName("is-case-sensitive")
+						.setDescription(
+							"Whether or not to check the pattern for case-sensitivity (false by default)"
+						)
 				)
 		)
 		.toJSON(),
@@ -89,10 +131,7 @@ export const commands = [
 
 // Renamed Handler Imports
 import { execute as executeLsemotes } from "./list-emotes";
-import {
-	execute as executeReact,
-	executeMenu as executeMenuReact,
-} from "./react";
+import { executeMenu as executeMenuReact } from "./react";
 import {
 	execute as executeSay,
 	executeMenuEdit,
@@ -108,9 +147,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		switch (interaction.commandName) {
 			case CMD_LSEMOTES:
 				await executeLsemotes(interaction);
-				break;
-			case CMD_REACT:
-				await executeReact(interaction);
 				break;
 			case CMD_SAY:
 				await executeSay(interaction);

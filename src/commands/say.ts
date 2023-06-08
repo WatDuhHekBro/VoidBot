@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { parseVarsCallback } from "../util/lib";
 import { emoteRegistry } from "../modules/emote-registry";
-import { CMD_SAY } from "./index";
+import { CMD_SAY } from ".";
 
 const ID_MENU = "say-query";
 const ID_MENU_INPUT = "say-query-input";
@@ -106,6 +106,7 @@ export async function executeMenuEdit(
 						.setPlaceholder(
 							"This is some sample text with /emote1/ and /emote2/, you know? Okay, but does he//she know?"
 						)
+						.setValue(message.content)
 						.setRequired(true)
 				)
 			)

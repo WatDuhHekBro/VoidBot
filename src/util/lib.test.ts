@@ -96,6 +96,14 @@ describe("Wrappers", () => {
 					[[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
 				);
 			});
+
+			it("should split [5] into [[5]]", () => {
+				assert.deepStrictEqual(split([5], 3), [[5]]);
+			});
+
+			it("should split [] into []", () => {
+				assert.deepStrictEqual(split([], 3), []);
+			});
 		});
 	});
 });
