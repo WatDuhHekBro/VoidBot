@@ -4,14 +4,28 @@ import {
 	MessageContextMenuCommandInteraction,
 	ModalActionRowComponentBuilder,
 	ModalBuilder,
+	PermissionsBitField,
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
+import { emoteRegistry } from "../modules/emote-registry";
 
 // Have "confirm" boolean option to make message ephemeral and show emotes to react with before reacting with it?
-// TODO: Also needs to check for permissions if react is off by default
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+	// You should check if the server owner has the reaction permission off by default first
+	if (
+		!interaction.guild?.members.me?.permissions.has(
+			PermissionsBitField.Flags.AddReactions
+		)
+	) {
+		return await interaction.reply({
+			content:
+				"**Error:** I don't have permissions to add reactions in the channel or server you tried to use this in!",
+			ephemeral: true,
+		});
+	}
+
 	await interaction.reply("react");
 }
 
@@ -21,8 +35,20 @@ const ID_MENU_INPUT = "react-query-input";
 export async function executeMenu(
 	interaction: MessageContextMenuCommandInteraction
 ) {
+	// You should check if the server owner has the reaction permission off by default first
+	if (
+		!interaction.guild?.members.me?.permissions.has(
+			PermissionsBitField.Flags.AddReactions
+		)
+	) {
+		return await interaction.reply({
+			content:
+				"**Error:** I don't have permissions to add reactions in the channel or server you tried to use this in!",
+			ephemeral: true,
+		});
+	}
+
 	const message = interaction.targetMessage;
-	await message.react("1055589478594527345");
 
 	await interaction.showModal(
 		new ModalBuilder()
@@ -46,16 +72,28 @@ export async function executeMenu(
 			time: 60000,
 		});
 
-		const emotes = response.fields.getTextInputValue(ID_MENU_INPUT);
-		console.log(emotes);
+		const emotesInput = response.fields.getTextInputValue(ID_MENU_INPUT);
+		const emotesList = emotesInput.split(/ +/);
+		const emotesOutput: string[] = [];
 
-		await response.reply({
-			content:
-				Math.random() < 0.5
-					? "Failed to react to the message."
-					: "Reacting...",
-			ephemeral: true,
-		});
+		for (const query of emotesList) {
+			emotesOutput.push(emoteRegistry.getNearestEmote(query));
+		}
+
+		await response.deferUpdate();
+
+		// React asynchronously in a loop
+		for (const emote of emotesOutput) {
+			try {
+				const reaction = await message.react(emote);
+
+				setTimeout(() => {
+					reaction.users.remove(reaction.client.user.id);
+				}, 5000);
+			} catch (error) {
+				return console.error(error);
+			}
+		}
 	} catch {
 		// Because the collector times out, there's no need for an error message
 	}

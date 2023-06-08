@@ -7,13 +7,13 @@ import {
 import { client } from "..";
 
 // Command Names
-const CMD_LSEMOTES = "list-emotes";
-const CMD_REACT = "react";
-const CMD_SAY = "say";
-const MENU_MSG_REACT = "React with Emotes";
-const MENU_MSG_SAY_EDIT = "Edit Proxy Message";
-const MENU_MSG_SAY_DELETE = "Delete Proxy Message";
-const MENU_MSG_POKEMON = "Attract";
+export const CMD_LSEMOTES = "list-emotes";
+export const CMD_REACT = "react";
+export const CMD_SAY = "say";
+export const MENU_MSG_REACT = "React with Emotes";
+export const MENU_MSG_SAY_EDIT = "Edit Proxy Message";
+export const MENU_MSG_SAY_DELETE = "Delete Proxy Message";
+export const MENU_MSG_POKEMON = "Tackle";
 
 // Command Definitions
 export const commands = [
@@ -58,19 +58,11 @@ export const commands = [
 				)
 		)
 		.toJSON(),
-	// say <message: string>
+	// say
 	new SlashCommandBuilder()
 		.setName(CMD_SAY)
 		.setDescription(
-			"Sends a message in your place with any emote you specify in /slashes/"
-		)
-		.addStringOption((option) =>
-			option
-				.setName("message")
-				.setDescription(
-					`The message to parse ("//" = slash, "\\" = new line, "\\\\" = backslash)`
-				)
-				.setRequired(true)
+			"Sends a proxy message in your place with any emote you specify in /slashes/"
 		)
 		.toJSON(),
 	// React to Message - Replaces the function of using ".react" via a message reply
@@ -109,6 +101,8 @@ import {
 
 // Command Router
 client.on(Events.InteractionCreate, async (interaction) => {
+	// Maybe in the future, edit interactions with buttons to be disabled if it's out of scope?
+	// Or an ephemeral message that lets the user know that the buttons they tried to use aren't monitored.
 	if (interaction.isChatInputCommand()) {
 		// Slash Commands
 		switch (interaction.commandName) {

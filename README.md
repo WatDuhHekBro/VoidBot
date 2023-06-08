@@ -2,6 +2,16 @@
 
 An experimental Discord bot. Contains a proof of concept for streamlining the process of using any emotes the bot has access to, without having to be in the same servers as the bot.
 
+## Setup Instructions
+
+- Clone the repo
+- `npm i`
+- `npm run build`
+- `npm run pkg`
+- Create an `.env` file containing `DISCORD_TOKEN` or set an environment variable
+- `./voidbot register` (global registration)
+- `./voidbot` (start running the bot)
+
 ## Package Commands
 
 - `npm start`: Watches for changes in the codebase
@@ -17,6 +27,7 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 	- `register (<guild>)`: Register command definitions, either globally or on a specific guild
 	- `clean (<guild>)` Removes all existing slash commands, either globally or a specific guild
 - `.env`: An optional file to set environment variables while running the bot. Used for read-only configuration data like tokens.
+- `logs/yyyy-mm-dd_hh-mm-ss.log`: Log files
 
 # Environment Variables
 

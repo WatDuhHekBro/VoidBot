@@ -1,13 +1,15 @@
 import "dotenv/config";
+import "./modules/globals";
 import { Client, GatewayIntentBits } from "discord.js";
 
 // First declare accessible constants
-// According to the Discord.js Guide: "The "Guilds" intents option is necessary for the discord.js client to work as you expect it to, as it ensures that the caches for guilds, channels, and roles are populated and available for internal use."
-// Attempting to react to a message won't work without it since there are no emotes in the cache
-// "GuildEmojisAndStickers" is needed in order to have the cache update whenever someone adds/edits/deletes an emote
 export const client = new Client({
 	intents: [
-		GatewayIntentBits.Guilds | GatewayIntentBits.GuildEmojisAndStickers,
+		// According to the Discord.js Guide: "The "Guilds" intents option is necessary for the discord.js client to work as you expect it to, as it ensures that the caches for guilds, channels, and roles are populated and available for internal use."
+		// Attempting to react to a message won't work without it since there are no emotes in the cache
+		GatewayIntentBits.Guilds,
+		// This is needed in order to have the cache update whenever someone adds/edits/deletes an emote
+		GatewayIntentBits.GuildEmojisAndStickers,
 	],
 });
 
