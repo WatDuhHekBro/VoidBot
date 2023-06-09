@@ -6,20 +6,20 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 
 - Clone the repo
 - `npm i`
-- `npm run build`
-- `npm run pkg`
+- `npm run build` (runs the TypeScript compiler)
+- `npm run pkg` (packages the codebase into an executable for easy deployment)
 - Create an `.env` file containing `DISCORD_TOKEN` or set an environment variable
 - `./voidbot register` (global registration)
 - `./voidbot` (start running the bot)
 
-## Package Commands
+## Dev Checklist
 
-- `npm start`: Watches for changes in the codebase
-- `npm run build`: Runs the TypeScript compiler
-- `npm run pkg`: Packages the codebase into an executable for easy deployment
-- `npm test`: Executes unit tests via Jest
-- `npm run fmt`: Formats the code via Prettier
-- `npm run once`: Builds and runs the program, optionally with command line arguments (i.e. `npm run once register 12345`)
+1. `npm start` (watches for changes in the codebase) or `npm run once` (builds and runs the program, optionally with command line arguments (i.e. `npm run once register 12345`))
+2. Make changes
+3. `npm test` (executes unit tests via Jest)
+4. `npm run fmt` (formats the code via Prettier)
+5. Update the `version` entry in `package.json` and do `npm i` to update `package-lock.json`
+6. Update the readme and the changelog
 
 # Files
 
@@ -52,3 +52,4 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 - User Menu: Info (for the bot, it'll prompt you to choose between a user guide or info about the bot, the code, maybe the dev server, etc. (can define in .env maybe?))
 - Matching strategy: Containing exact substrings (i.e. `ost` --> `p5_ost_41`)
 - Revise matching strategy: Unit tests will consist of testing ordered lists of possible emote names and how they should be ordered (developer-defined heuristics)
+- Fix emote selector (`~#`) to match distance query

@@ -1,14 +1,14 @@
 {
 	"name": "voidbot",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"main": "out/index.js",
 	"scripts": {
 		"start": "npm run genversion && tsc-watch --onSuccess \"node .\"",
+		"once": "npm run genversion && tsc && node .",
 		"build": "npm run genversion && tsc",
 		"pkg": "pkg --targets node18-linux-x64 --output voidbot out/index.js",
 		"test": "jest",
 		"fmt": "prettier --write .",
-		"once": "npm run genversion && tsc && node .",
 		"genversion": "genversion --es6 --double --semi src/version.ts"
 	},
 	"dependencies": {

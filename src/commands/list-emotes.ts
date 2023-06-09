@@ -334,7 +334,7 @@ function getEmoteEmbed(
 			embedGuilds.push(entry.guild);
 
 			// Redundant as hasDistance, but oh well
-			if (entry.distance) {
+			if (entry.distance !== null) {
 				embedDistance.push(entry.distance);
 			}
 		}
