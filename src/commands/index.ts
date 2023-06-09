@@ -21,9 +21,9 @@ export const MENU_MSG_POKEMON = "Tackle";
 
 // Command Definitions
 export const commands = [
-	// list-emotes all (<sort-by: string choices>)
-	// list-emotes query <query: string> (<levenshtein-threshold>: number (>= 0))
-	// list-emotes regex <pattern: string> (<is-case-sensitive: boolean>)
+	// list-emotes all (<sort-by: string choices>) (<use-columns: boolean>)
+	// list-emotes query <query: string> (<levenshtein-threshold>: number (>= 0)) (<use-columns: boolean>)
+	// list-emotes regex <pattern: string> (<is-case-sensitive: boolean>) (<use-columns: boolean>)
 	new SlashCommandBuilder()
 		.setName(CMD_LSEMOTES)
 		.setDescription(
@@ -50,6 +50,13 @@ export const commands = [
 								name: "Alphabetical (Descending)",
 								value: SORT_BY_ALPHA_DESC,
 							}
+						)
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName("use-columns")
+						.setDescription(
+							"Displays the emote list in a table (recommended for desktop but not mobile)"
 						)
 				)
 		)
@@ -80,6 +87,13 @@ export const commands = [
 							"Disables filtering emotes by a threshold (Default: false)"
 						)
 				)
+				.addBooleanOption((option) =>
+					option
+						.setName("use-columns")
+						.setDescription(
+							"Displays the emote list in a table (recommended for desktop but not mobile)"
+						)
+				)
 		)
 		.addSubcommand((subcommand) =>
 			subcommand
@@ -96,6 +110,13 @@ export const commands = [
 						.setName("is-case-sensitive")
 						.setDescription(
 							"Whether or not to check the pattern for case-sensitivity (false by default)"
+						)
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName("use-columns")
+						.setDescription(
+							"Displays the emote list in a table (recommended for desktop but not mobile)"
 						)
 				)
 		)

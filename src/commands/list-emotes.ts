@@ -37,6 +37,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 	const subcommand = interaction.options.getSubcommand();
 	const embedEntries: EmbedEntry[] = [];
 	let hasDistance = false;
+	let useColumns = false;
 
 	// Generates different field text for the embed depending on the mode given
 	// Then add those entries to the embed-related arrays, as that's all that'll be used in the end
@@ -44,6 +45,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 	if (subcommand === CMD_LSEMOTES_ALL) {
 		const sortMode =
 			interaction.options.getString("sort-by") ?? SORT_BY_ALPHA_ASC;
+		useColumns = interaction.options.getBoolean("use-columns") ?? false;
 
 		const emotes = emoteRegistry.getAlphaSortedEmotes();
 
@@ -67,6 +69,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		const disableThreshold =
 			interaction.options.getBoolean("disable-threshold") ?? false;
 		let emotes: DistanceEmote[];
+		useColumns = interaction.options.getBoolean("use-columns") ?? false;
 
 		if (disableThreshold) {
 			emotes = emoteRegistry.getDistanceSortedEmotes(query, null);
@@ -87,6 +90,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 		const pattern = interaction.options.getString("pattern")!;
 		const isCaseSensitive =
 			interaction.options.getBoolean("is-case-sensitive") ?? false;
+		useColumns = interaction.options.getBoolean("use-columns") ?? false;
 
 		const emotes = emoteRegistry.getRegexFilteredEmotes(
 			pattern,
@@ -150,7 +154,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 					currentPage + 1,
 					totalPages,
 					pages[currentPage],
-					hasDistance
+					hasDistance,
+					useColumns
 				),
 			],
 		});
@@ -162,7 +167,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 				currentPage + 1,
 				totalPages,
 				pages[currentPage],
-				hasDistance
+				hasDistance,
+				useColumns
 			),
 		],
 		components: [row],
@@ -233,7 +239,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 							currentPage + 1,
 							totalPages,
 							pages[currentPage],
-							hasDistance
+							hasDistance,
+							useColumns
 						),
 					],
 					components: [row],
@@ -268,7 +275,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 						currentPage + 1,
 						totalPages,
 						pages[currentPage],
-						hasDistance
+						hasDistance,
+						useColumns
 					),
 				],
 				components: [row],
@@ -313,51 +321,77 @@ function getEmoteEmbed(
 	currentPage: number,
 	totalPages: number,
 	page: EmbedEntry[],
-	hasDistance: boolean
-) {
-	const embedEmotes: string[] = [];
-	const embedGuilds: string[] = [];
-	const embedDistance: number[] = [];
+	hasDistance: boolean,
+	useColumns: boolean
+): EmbedBuilder {
+	if (useColumns) {
+		const embedEmotes: string[] = [];
+		const embedGuilds: string[] = [];
+		const embedDistance: number[] = [];
 
-	for (const entry of page) {
-		embedEmotes.push(entry.emote);
-		embedGuilds.push(entry.guild);
+		for (const entry of page) {
+			embedEmotes.push(entry.emote);
+			embedGuilds.push(entry.guild);
 
-		// Redundant as hasDistance, but oh well
-		if (entry.distance) {
-			embedDistance.push(entry.distance);
+			// Redundant as hasDistance, but oh well
+			if (entry.distance) {
+				embedDistance.push(entry.distance);
+			}
 		}
+
+		const embed = new EmbedBuilder()
+			.setColor("Aqua")
+			.setTitle(
+				totalPages === 1
+					? "**Emotes**"
+					: `**Emotes** (Page ${currentPage} of ${totalPages})`
+			)
+			.addFields([
+				{
+					name: "Emote",
+					value: embedEmotes.join("\n"),
+					inline: true,
+				},
+				{
+					name: "Server",
+					value: embedGuilds.join("\n"),
+					inline: true,
+				},
+			]);
+
+		if (hasDistance) {
+			embed.addFields([
+				{
+					name: "Likeness",
+					value: embedDistance.join("\n"),
+					inline: true,
+				},
+			]);
+		}
+
+		return embed;
+	} else {
+		const description: string[] = [];
+
+		for (const entry of page) {
+			if (hasDistance) {
+				description.push(
+					`${entry.emote} [**${entry.guild}**] *(Likeness: ${entry.distance})*`
+				);
+			} else {
+				description.push(`${entry.emote} [**${entry.guild}**]`);
+			}
+		}
+
+		const embed = new EmbedBuilder()
+			.setColor("Aqua")
+			.setTitle(
+				totalPages === 1
+					? "**Emotes**"
+					: `**Emotes** (Page ${currentPage} of ${totalPages})`
+			)
+			.setDescription(description.join("\n"));
+
+		return embed;
 	}
-
-	const embed = new EmbedBuilder()
-		.setTitle(
-			totalPages === 1
-				? "**Emotes**"
-				: `**Emotes** (Page ${currentPage} of ${totalPages})`
-		)
-		.setColor("Aqua")
-		.addFields([
-			{
-				name: "Emote",
-				value: embedEmotes.join("\n"),
-				inline: true,
-			},
-			{
-				name: "Server",
-				value: embedGuilds.join("\n"),
-				inline: true,
-			},
-		]);
-
-	if (hasDistance) {
-		embed.addFields([
-			{
-				name: "Likeness",
-				value: embedDistance.join("\n"),
-				inline: true,
-			},
-		]);
-	}
-
-	return embed;
 }

@@ -1,3 +1,0 @@
-- A refactor is absolutely necessary given the kludge of figuring things out
-- Dev mode to suppress logs?
-- /list-emotes backup (sends JSON file for backup purposes)

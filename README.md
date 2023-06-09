@@ -42,3 +42,13 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 
 - Create a react prompt to that specific message
 - Edit or delete a proxy message via `/say`
+
+# To-Do
+
+- A refactor is absolutely necessary given the kludge of figuring things out
+- Dev mode to suppress logs? Also restore `DEV_GUILD` for test bot, replaces functionality of `./voidbot register/clear`
+- /list-emotes backup (sends JSON file for backup purposes)
+- Create user-defined emote aliases? Users can also block out emotes they choose
+- User Menu: Info (for the bot, it'll prompt you to choose between a user guide or info about the bot, the code, maybe the dev server, etc. (can define in .env maybe?))
+- Matching strategy: Containing exact substrings (i.e. `ost` --> `p5_ost_41`)
+- Revise matching strategy: Unit tests will consist of testing ordered lists of possible emote names and how they should be ordered (developer-defined heuristics)
