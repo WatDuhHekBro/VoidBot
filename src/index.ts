@@ -1,5 +1,5 @@
 import "dotenv/config";
-import "./modules/globals";
+import { initFileLogger } from "./modules/globals";
 import { Client, GatewayIntentBits } from "discord.js";
 
 // First declare accessible constants
@@ -26,6 +26,11 @@ if (token) {
 
 	// Start the bot normally
 	if (choice === undefined) {
+		// Check if suppress logs is set to any string, otherwise enable logs
+		if (!process.env.SUPPRESS_LOGS) {
+			initFileLogger();
+		}
+
 		client.login(token).catch(console.error);
 	}
 	// Register command definitions

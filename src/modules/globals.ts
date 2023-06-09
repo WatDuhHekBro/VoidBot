@@ -9,12 +9,7 @@ declare global {
 }
 
 const oldConsole = console;
-
-// Create write stream to log files
-if (!fs.existsSync("logs")) fs.mkdirSync("logs");
-const writer = fs.createWriteStream(
-	path.join("logs", `${getFormattedTimestamp(true)}.log`)
-);
+let writer: fs.WriteStream | undefined;
 
 // The custom console. In order of verbosity, error, warn, log, and debug. Ready is a variation of log.
 console = {
@@ -27,7 +22,7 @@ console = {
 			chalk.black.bgWhite("INFO"),
 			...args
 		);
-		writer.write(`[${timestamp}] [INFO] ${args.join(" ")}\n`);
+		writer?.write(`[${timestamp}] [INFO] ${args.join(" ")}\n`);
 	},
 	// "It'll still work, but you should really check up on this."
 	warn(...args: any[]) {
@@ -37,7 +32,7 @@ console = {
 			chalk.black.bgYellow("WARN"),
 			...args
 		);
-		writer.write(`[${timestamp}] [WARN] ${args.join(" ")}\n`);
+		writer?.write(`[${timestamp}] [WARN] ${args.join(" ")}\n`);
 	},
 	// Used for anything which prevents the program from actually running.
 	error(...args: any[]) {
@@ -47,7 +42,7 @@ console = {
 			chalk.white.bgRed("ERROR"),
 			...args
 		);
-		writer.write(`[${timestamp}] [ERROR] ${args.join(" ")}\n`);
+		writer?.write(`[${timestamp}] [ERROR] ${args.join(" ")}\n`);
 	},
 	// Be as verbose as possible. If anything might help when debugging an error, then include it.
 	// Format: <path>/::(<object>.)<function>(<args>) = <value>
@@ -60,7 +55,7 @@ console = {
 			chalk.white.bgBlue("DEBUG"),
 			...args
 		);
-		writer.write(`[${timestamp}] [DEBUG] ${args.join(" ")}\n`);
+		writer?.write(`[${timestamp}] [DEBUG] ${args.join(" ")}\n`);
 	},
 	// Used once at the start of the program when the bot loads.
 	ready(...args: any[]) {
@@ -70,9 +65,21 @@ console = {
 			chalk.black.bgGreen("READY"),
 			...args
 		);
-		writer.write(`[${timestamp}] [READY] ${args.join(" ")}\n`);
+		writer?.write(`[${timestamp}] [READY] ${args.join(" ")}\n`);
 	},
 };
+
+// Enable conditionally:
+// - Only when running the bot, not on register/clear
+// - Not when SUPPRESS_LOGS is enabled
+export function initFileLogger() {
+	// Create write stream to log files
+	if (!fs.existsSync("logs")) fs.mkdirSync("logs");
+
+	writer = fs.createWriteStream(
+		path.join("logs", `${getFormattedTimestamp(true)}.log`)
+	);
+}
 
 function getFormattedTimestamp(filename = false) {
 	const now = new Date();

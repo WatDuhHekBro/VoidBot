@@ -32,6 +32,8 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 # Environment Variables
 
 - `DISCORD_TOKEN`: The token for your bot. (_required_)
+- `DEV_GUILD`: The server ID to automatically register/clear commands to.
+- `SUPPRESS_LOGS`: If it's set to any string (but not the empty string), it'll disable generating logs. Useful during development.
 
 # Commands
 
@@ -46,7 +48,6 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 # To-Do
 
 - A refactor is absolutely necessary given the kludge of figuring things out
-- Dev mode to suppress logs? Also restore `DEV_GUILD` for test bot, replaces functionality of `./voidbot register/clear`
 - /list-emotes backup (sends JSON file for backup purposes)
 - Create user-defined emote aliases? Users can also block out emotes they choose
 - User Menu: Info (for the bot, it'll prompt you to choose between a user guide or info about the bot, the code, maybe the dev server, etc. (can define in .env maybe?))

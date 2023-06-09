@@ -12,7 +12,8 @@ export async function registerCommands(token: string, clear: boolean) {
 
 	const clientID = Buffer.from(tokens[0], "base64").toString();
 	const rest = new REST().setToken(token);
-	const guildID: string | undefined = process.argv[3];
+	const guildID: string | undefined =
+		process.env.DEV_GUILD || process.argv[3];
 
 	if (guildID) {
 		console.log(
