@@ -14,6 +14,7 @@ export const CMD_LSEMOTES_ALL = "all";
 export const CMD_LSEMOTES_QUERY = "query";
 export const CMD_LSEMOTES_REGEX = "regex";
 export const CMD_SAY = "say";
+export const CMD_TEST = "test";
 export const MENU_MSG_REACT = "[React]";
 export const MENU_MSG_SAY_EDIT = "Proxy Message: Edit";
 export const MENU_MSG_SAY_DELETE = "Proxy Message: Delete";
@@ -107,6 +108,11 @@ export const commands = [
 			"Sends a proxy message in your place with any emote you specify in /slashes/"
 		)
 		.toJSON(),
+	// test
+	new SlashCommandBuilder()
+		.setName(CMD_TEST)
+		.setDescription("much testing innit")
+		.toJSON(),
 	// React to Message - Replaces the function of using ".react" via a message reply
 	new ContextMenuCommandBuilder()
 		.setName(MENU_MSG_REACT)
@@ -137,6 +143,7 @@ import {
 	executeMenuEdit,
 	executeMenuDelete,
 } from "./say";
+import { execute as executeTest } from "./test";
 
 // Command Router
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -150,6 +157,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 				break;
 			case CMD_SAY:
 				await executeSay(interaction);
+				break;
+			case CMD_TEST:
+				await executeTest(interaction);
 				break;
 			default:
 				await interaction.reply({

@@ -10,6 +10,7 @@ export const client = new Client({
 		GatewayIntentBits.Guilds,
 		// This is needed in order to have the cache update whenever someone adds/edits/deletes an emote
 		GatewayIntentBits.GuildEmojisAndStickers,
+		GatewayIntentBits.GuildVoiceStates,
 	],
 });
 
