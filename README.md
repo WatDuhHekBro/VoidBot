@@ -54,3 +54,6 @@ An experimental Discord bot. Contains a proof of concept for streamlining the pr
 - Matching strategy: Containing exact substrings (i.e. `ost` --> `p5_ost_41`)
 - Revise matching strategy: Unit tests will consist of testing ordered lists of possible emote names and how they should be ordered (developer-defined heuristics)
 - Fix emote selector (`~#`) to match distance query
+- Integrate context menu for ephemeral messages: Custom proxy instance redirection service (maybe a select menu of favorite instances)
+- Maybe a versatile highly-customizable message reaction system that allows pattern matching for in-jokes without hardcoding it into the code (such as CrossExchange's message module), also make it guild-specific
+- Matching Strategy: Make underscores (`_`) equivalent to spaces, causing the weight to be zero (e.g. `p5_ost_41` = `p5 ost 41`)
