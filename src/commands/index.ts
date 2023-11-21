@@ -17,6 +17,7 @@ export const CMD_SAY = "say";
 export const MENU_MSG_REACT = "[React]";
 export const MENU_MSG_SAY_EDIT = "Proxy Message: Edit";
 export const MENU_MSG_SAY_DELETE = "Proxy Message: Delete";
+export const MENU_MSG_FILTER_LINKS = "[Filter Links]";
 export const MENU_MSG_POKEMON = "Tackle";
 
 // Command Definitions
@@ -143,6 +144,11 @@ export const commands = [
 		.setName(MENU_MSG_SAY_DELETE)
 		.setType(ApplicationCommandType.Message)
 		.toJSON(),
+	// Filter Links - Examine each URL and replace if necessary
+	new ContextMenuCommandBuilder()
+		.setName(MENU_MSG_FILTER_LINKS)
+		.setType(ApplicationCommandType.Message)
+		.toJSON(),
 	// Pokemon
 	new ContextMenuCommandBuilder()
 		.setName(MENU_MSG_POKEMON)
@@ -158,6 +164,7 @@ import {
 	executeMenuEdit,
 	executeMenuDelete,
 } from "./say";
+import { executeMenu as executeMenuFilterLinks } from "./filter-links";
 
 // Command Router
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -189,6 +196,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 				break;
 			case MENU_MSG_SAY_DELETE:
 				await executeMenuDelete(interaction);
+				break;
+			case MENU_MSG_FILTER_LINKS:
+				await executeMenuFilterLinks(interaction);
 				break;
 			case MENU_MSG_POKEMON:
 				await interaction.reply("It's super effective!");
