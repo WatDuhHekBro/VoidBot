@@ -10,6 +10,10 @@ export const client = new Client({
 		GatewayIntentBits.Guilds,
 		// This is needed in order to have the cache update whenever someone adds/edits/deletes an emote
 		GatewayIntentBits.GuildEmojisAndStickers,
+		// Required for message intercepts
+		// Maybe add a conditional way to include this?
+		GatewayIntentBits.GuildMessages, // Gets access to the message event firing off in the first place
+		GatewayIntentBits.MessageContent, // Required if you actually want to read those message
 	],
 });
 
